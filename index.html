@@ -2129,129 +2129,7 @@ var TEMA = {
 /* ═══════════════════════════════════════════════════════
    MÓDULO: FERIADOS
 ═══════════════════════════════════════════════════════ */
-var FERIADOS = {
-  _key: 'ebi_feriados',
 
-  get: function() {
-    try { return JSON.parse(localStorage.getItem(this._key) || '[]'); }
-    catch(e) { return []; }
-  },
-
-  save: function(arr) {
-    localStorage.setItem(this._key, JSON.stringify(arr));
-  },
-
-  adicionar: function(data, nome) {
-    if (!data || !nome) return false;
-    var arr = this.get();
-    if (arr.find(function(f) { return f.data === data; })) return false;
-    arr.push({ data: data, nome: nome.trim() });
-    arr.sort(function(a, b) { return a.data.localeCompare(b.data); });
-    this.save(arr);
-    return true;
-  },
-
-  remover: function(data) {
-    this.save(this.get().filter(function(f) { return f.data !== data; }));
-  },
-
-  ehFeriado: function(data) {
-    return this.get().some(function(f) { return f.data === data; });
-  },
-
-  /* Feriados nacionais fixos do Brasil */
-  nacionais: function(ano) {
-    return [
-      { data: ano + '-01-01', nome: 'Ano Novo' },
-      { data: ano + '-04-21', nome: 'Tiradentes' },
-      { data: ano + '-05-01', nome: 'Dia do Trabalho' },
-      { data: ano + '-09-07', nome: 'Independência' },
-      { data: ano + '-10-12', nome: 'Nossa Sra. Aparecida' },
-      { data: ano + '-11-02', nome: 'Finados' },
-      { data: ano + '-11-15', nome: 'Proclamação da República' },
-      { data: ano + '-12-25', nome: 'Natal' },
-    ];
-  },
-
-  importarNacionais: function(ano) {
-    var lista = this.nacionais(String(ano));
-    var adicionados = 0;
-    lista.forEach(function(f) {
-      if (FERIADOS.adicionar(f.data, f.nome)) adicionados++;
-    });
-    return adicionados;
-  },
-
-  renderizar: function() {
-    var container = document.getElementById('feriados-body');
-    if (!container) return;
-    var arr = this.get();
-
-    var html = '<div class="form-card"><div class="card-title">➕ Adicionar Feriado</div>' +
-      '<div class="form-grid">' +
-      '<div class="field"><span class="field-label">Data</span>' +
-      '<input type="date" id="feriado-data"/></div>' +
-      '<div class="field"><span class="field-label">Nome</span>' +
-      '<input type="text" id="feriado-nome" placeholder="Ex: Feriado Municipal"/></div>' +
-      '<div class="field field-btn">' +
-      '<button class="btn-save" onclick="FERIADOS._adicionarUI()">＋ Adicionar</button></div>' +
-      '</div>' +
-      '<div style="margin-top:10px">' +
-      '<button class="btn-secondary" style="width:auto;padding:8px 14px" ' +
-      'onclick="FERIADOS._importarUI()">📅 Importar Feriados Nacionais ' + new Date().getFullYear() + '</button>' +
-      '</div></div>';
-
-    if (!arr.length) {
-      html += '<p class="empty-state">Nenhum feriado cadastrado.</p>';
-    } else {
-      html += '<div class="lista-header"><h2>Feriados Cadastrados</h2>' +
-        '<span class="badge">' + arr.length + '</span></div>';
-      html += '<ul class="feriados-lista">';
-      arr.forEach(function(f) {
-        var p = f.data.split('-');
-        var dataFmt = p[2] + '/' + p[1] + '/' + p[0];
-        var dia = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'][new Date(f.data+'T00:00:00').getDay()];
-        html += '<li class="feriado-item">' +
-          '<div class="feriado-data"><strong>' + dataFmt + '</strong><span>' + dia + '</span></div>' +
-          '<div class="feriado-nome">' + f.nome + '</div>' +
-          '<button class="btn-del-card" onclick="FERIADOS._removerUI(\'' + f.data + '\')">🗑</button>' +
-          '</li>';
-      });
-      html += '</ul>';
-    }
-
-    container.innerHTML = html;
-  },
-
-  _adicionarUI: function() {
-    var data = document.getElementById('feriado-data').value;
-    var nome = document.getElementById('feriado-nome').value;
-    if (!data || !nome) { toast('Preencha data e nome!', 'erro'); return; }
-    if (this.adicionar(data, nome)) {
-      document.getElementById('feriado-data').value = '';
-      document.getElementById('feriado-nome').value = '';
-      this.renderizar();
-      toast('Feriado adicionado! ✓');
-    } else {
-      toast('Já existe feriado nesta data!', 'aviso');
-    }
-  },
-
-  _removerUI: function(data) {
-    if (!confirm('Remover este feriado?')) return;
-    this.remover(data);
-    this.renderizar();
-    toast('Feriado removido.', 'erro');
-  },
-
-  _importarUI: function() {
-    var ano = new Date().getFullYear();
-    var qtd = this.importarNacionais(ano);
-    this.renderizar();
-    if (qtd > 0) toast(qtd + ' feriados nacionais importados! ✓');
-    else toast('Feriados nacionais já estavam cadastrados.', 'aviso');
-  }
-};
 
 /* ═══════════════════════════════════════════════════════
    MÓDULO: FOTOS DE PERFIL
@@ -2327,6 +2205,144 @@ var FOTOS = {
 /* ═══════════════════════════════════════════════════════
    MÓDULO: HISTÓRICO DE FALTAS
 ═══════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════
+   MÓDULO: CALENDÁRIO SEMANAL
+═══════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════
+   MÓDULO: SUBSTITUIÇÃO
+═══════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════
+   MÓDULO: ESTATÍSTICAS / GRÁFICOS
+═══════════════════════════════════════════════════════ */
+
+
+
+
+/* ════════════════════════════════════════════════════════
+   MÓDULO FERIADOS — v2 corrigido
+════════════════════════════════════════════════════════ */
+var FERIADOS = {
+  _key: 'ebi_feriados',
+
+  get: function() {
+    try { return JSON.parse(localStorage.getItem(this._key) || '[]'); }
+    catch(e) { return []; }
+  },
+
+  save: function(arr) { localStorage.setItem(this._key, JSON.stringify(arr)); },
+
+  adicionar: function(data, nome) {
+    if (!data || !nome) return false;
+    var arr = this.get();
+    if (arr.some(function(f){ return f.data === data; })) return false;
+    arr.push({ data: data, nome: nome.trim() });
+    arr.sort(function(a,b){ return a.data.localeCompare(b.data); });
+    this.save(arr);
+    return true;
+  },
+
+  remover: function(data) {
+    this.save(this.get().filter(function(f){ return f.data !== data; }));
+  },
+
+  ehFeriado: function(data) {
+    return this.get().some(function(f){ return f.data === data; });
+  },
+
+  importarNacionais: function(ano) {
+    var lista = [
+      { data: ano+'-01-01', nome: 'Ano Novo' },
+      { data: ano+'-04-21', nome: 'Tiradentes' },
+      { data: ano+'-05-01', nome: 'Dia do Trabalho' },
+      { data: ano+'-09-07', nome: 'Independencia' },
+      { data: ano+'-10-12', nome: 'N. Sra. Aparecida' },
+      { data: ano+'-11-02', nome: 'Finados' },
+      { data: ano+'-11-15', nome: 'Proclamacao da Republica' },
+      { data: ano+'-12-25', nome: 'Natal' }
+    ];
+    var qtd = 0;
+    lista.forEach(function(f){ if(FERIADOS.adicionar(f.data, f.nome)) qtd++; });
+    return qtd;
+  },
+
+  renderizar: function() {
+    var container = document.getElementById('feriados-body');
+    if (!container) return;
+    var arr = this.get();
+    var ano = new Date().getFullYear();
+    var partes = [];
+
+    partes.push('<div class="form-card">');
+    partes.push('<div class="card-title">Adicionar Feriado</div>');
+    partes.push('<div class="form-grid">');
+    partes.push('<div class="field"><span class="field-label">Data</span><input type="date" id="feriado-data"/></div>');
+    partes.push('<div class="field"><span class="field-label">Nome</span><input type="text" id="feriado-nome" placeholder="Ex: Feriado Municipal"/></div>');
+    partes.push('<div class="field field-btn"><button class="btn-save" id="btn-fer-add">+ Adicionar</button></div>');
+    partes.push('</div>');
+    partes.push('<div style="margin-top:10px"><button class="btn-secondary" id="btn-fer-import" style="width:auto;padding:8px 14px">Importar Feriados Nacionais '+ano+'</button></div>');
+    partes.push('</div>');
+
+    if (!arr.length) {
+      partes.push('<p class="empty-state">Nenhum feriado cadastrado.<br>Clique em Importar para adicionar os feriados nacionais.</p>');
+    } else {
+      partes.push('<div class="lista-header"><h2>Feriados</h2><span class="badge">'+arr.length+'</span></div>');
+      partes.push('<ul class="feriados-lista">');
+      arr.forEach(function(f) {
+        var p = f.data.split('-');
+        var fmt = p[2]+'/'+p[1]+'/'+p[0];
+        var ds = ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'][new Date(f.data+'T00:00:00').getDay()];
+        partes.push('<li class="feriado-item">');
+        partes.push('<div class="feriado-data"><strong>'+fmt+'</strong><span>'+ds+'</span></div>');
+        partes.push('<div class="feriado-nome">'+f.nome+'</div>');
+        partes.push('<button class="btn-del-card fer-del" data-dt="'+f.data+'">🗑</button>');
+        partes.push('</li>');
+      });
+      partes.push('</ul>');
+    }
+
+    container.innerHTML = partes.join('');
+
+    /* Eventos via JS puro - sem onclick inline */
+    var btnAdd = document.getElementById('btn-fer-add');
+    if (btnAdd) btnAdd.onclick = function() {
+      var data = document.getElementById('feriado-data').value;
+      var nome = document.getElementById('feriado-nome').value.trim();
+      if (!data || !nome) { toast('Preencha data e nome!','erro'); return; }
+      if (FERIADOS.adicionar(data, nome)) {
+        document.getElementById('feriado-data').value = '';
+        document.getElementById('feriado-nome').value = '';
+        FERIADOS.renderizar();
+        toast('Feriado adicionado!');
+      } else { toast('Ja existe feriado nesta data!','aviso'); }
+    };
+
+    var btnImp = document.getElementById('btn-fer-import');
+    if (btnImp) btnImp.onclick = function() {
+      var qtd = FERIADOS.importarNacionais(String(new Date().getFullYear()));
+      FERIADOS.renderizar();
+      toast(qtd > 0 ? qtd+' feriados importados!' : 'Feriados ja cadastrados.', qtd>0?'sucesso':'aviso');
+    };
+
+    container.querySelectorAll('.fer-del').forEach(function(btn) {
+      btn.onclick = function() {
+        if (!confirm('Remover este feriado?')) return;
+        FERIADOS.remover(btn.getAttribute('data-dt'));
+        FERIADOS.renderizar();
+        toast('Feriado removido.','erro');
+      };
+    });
+  }
+};
+
+/* ════════════════════════════════════════════════════════
+   MÓDULO FALTAS — v2 corrigido
+════════════════════════════════════════════════════════ */
 var FALTAS = {
   _key: 'ebi_faltas',
 
@@ -2337,436 +2353,378 @@ var FALTAS = {
 
   save: function(arr) { localStorage.setItem(this._key, JSON.stringify(arr)); },
 
-  registrar: function(escaladId, nome, data, motivo) {
+  registrar: function(nome, data, motivo) {
     var arr = this.get();
-    arr.push({
-      id: Date.now().toString(36),
-      escalaId: escaladId,
-      nome: nome,
-      data: data,
-      motivo: motivo || 'Não informado',
-      registradoEm: new Date().toISOString()
-    });
+    arr.push({ id: Date.now().toString(36), nome: nome, data: data, motivo: motivo||'Nao informado', em: new Date().toISOString() });
     this.save(arr);
   },
 
-  getPorPessoa: function(nome) {
-    return this.get().filter(function(f) { return f.nome === nome; });
-  },
-
-  getPorMes: function(mes) {
-    return this.get().filter(function(f) { return f.data.startsWith(mes); });
-  },
-
   remover: function(id) {
-    this.save(this.get().filter(function(f) { return f.id !== id; }));
+    this.save(this.get().filter(function(f){ return f.id !== id; }));
+  },
+
+  getPorPessoa: function(nome) {
+    return this.get().filter(function(f){ return f.nome === nome; });
   },
 
   renderizar: function() {
     var container = document.getElementById('faltas-body');
     if (!container) return;
+    container.innerHTML = '<p class="empty-state">Carregando...</p>';
+
     var mes = document.getElementById('mesSelecionado').value;
-    var arr = mes ? this.getPorMes(mes) : this.get();
-    arr.sort(function(a,b) { return b.data.localeCompare(a.data); });
+    var todasFaltas = this.get();
+    var arr = mes ? todasFaltas.filter(function(f){ return f.data.startsWith(mes); }) : todasFaltas;
+    arr.sort(function(a,b){ return b.data.localeCompare(a.data); });
 
-    /* Contar por pessoa */
     var contagem = {};
-    this.get().forEach(function(f) {
-      contagem[f.nome] = (contagem[f.nome] || 0) + 1;
-    });
+    todasFaltas.forEach(function(f){ contagem[f.nome] = (contagem[f.nome]||0)+1; });
 
-    var html = '<div class="form-card"><div class="card-title">➕ Registrar Falta</div>' +
-      '<div class="form-grid">';
-
-    /* Select de pessoas escaladas no mês */
-    html += '<div class="field"><span class="field-label">Pessoa</span>' +
-      '<select id="falta-pessoa"><option value="">Selecione...</option></select></div>';
-    html += '<div class="field"><span class="field-label">Data do turno perdido</span>' +
-      '<input type="date" id="falta-data"/></div>';
-    html += '<div class="field"><span class="field-label">Motivo</span>' +
-      '<input type="text" id="falta-motivo" placeholder="Ex: Doença, Viagem..."/></div>';
-    html += '<div class="field field-btn">' +
-      '<button class="btn-save" onclick="FALTAS._registrarUI()">Registrar</button></div>';
-    html += '</div></div>';
-
-    /* Lista de faltas */
-    if (!arr.length) {
-      html += '<p class="empty-state">Nenhuma falta registrada' + (mes ? ' neste mês' : '') + '.</p>';
-    } else {
-      html += '<div class="lista-header"><h2>Faltas Registradas</h2><span class="badge">' + arr.length + '</span></div>';
-      html += '<ul>';
-      arr.forEach(function(f) {
-        var p = f.data.split('-');
-        var dataFmt = p[2]+'/'+p[1]+'/'+p[0];
-        html += '<li class="escala-item">' +
-          FOTOS.avatar(f.nome, 32) +
-          '<div class="c-pessoa" style="flex:1">' +
-            '<div style="font-weight:700;color:var(--text)">' + f.nome + '</div>' +
-            '<div style="font-size:12px;color:var(--text-dim)">' + dataFmt + ' — ' + f.motivo + '</div>' +
-          '</div>' +
-          '<span class="badge" style="background:rgba(255,82,82,.15);color:var(--danger);border-color:rgba(255,82,82,.3)">' +
-            contagem[f.nome] + ' falta' + (contagem[f.nome]>1?'s':'') +
-          '</span>' +
-          '<button class="btn-del-card" onclick="FALTAS._removerUI(\'' + f.id + '\')">🗑</button>' +
-          '</li>';
-      });
-      html += '</ul>';
-    }
-    container.innerHTML = html;
-
-    /* Preencher select com pessoas */
     api.getPessoas().then(function(pessoas) {
-      var sel = document.getElementById('falta-pessoa');
-      if (!sel) return;
-      pessoas.sort(function(a,b){return a.nome.localeCompare(b.nome);}).forEach(function(p) {
-        sel.innerHTML += '<option value="' + p.nome + '">' + p.nome + '</option>';
+      var partes = [];
+      partes.push('<div class="form-card"><div class="card-title">Registrar Falta</div>');
+      partes.push('<div class="form-grid">');
+      partes.push('<div class="field"><span class="field-label">Pessoa</span>');
+      partes.push('<select id="falta-pessoa"><option value="">Selecione...</option>');
+      pessoas.sort(function(a,b){return a.nome.localeCompare(b.nome);}).forEach(function(p){
+        partes.push('<option value="'+p.nome+'">'+p.nome+' ('+p.tipo+')</option>');
       });
+      partes.push('</select></div>');
+      partes.push('<div class="field"><span class="field-label">Data do turno</span><input type="date" id="falta-data"/></div>');
+      partes.push('<div class="field"><span class="field-label">Motivo</span><input type="text" id="falta-motivo" placeholder="Ex: Doenca, Viagem..."/></div>');
+      partes.push('<div class="field field-btn"><button class="btn-save" id="btn-falta-add">Registrar</button></div>');
+      partes.push('</div></div>');
+
+      if (!arr.length) {
+        partes.push('<p class="empty-state">Nenhuma falta registrada'+(mes?' neste mes':'')+'. <br>Use o formulario acima para registrar.</p>');
+      } else {
+        partes.push('<div class="lista-header"><h2>Faltas Registradas</h2><span class="badge">'+arr.length+'</span></div>');
+        partes.push('<ul>');
+        arr.forEach(function(f) {
+          var p = f.data.split('-');
+          var fmt = p[2]+'/'+p[1]+'/'+p[0];
+          var tot = contagem[f.nome]||0;
+          partes.push('<li class="escala-item">');
+          partes.push(FOTOS.avatar(f.nome, 32));
+          partes.push('<div class="c-pessoa" style="flex:1">');
+          partes.push('<div style="font-weight:700">'+f.nome+'</div>');
+          partes.push('<div style="font-size:11px;color:var(--text-dim)">'+fmt+' — '+f.motivo+'</div>');
+          partes.push('</div>');
+          partes.push('<span class="badge" style="background:rgba(255,82,82,.12);color:var(--danger)">'+tot+' falta'+(tot>1?'s':'')+'</span>');
+          partes.push('<button class="btn-del-card falta-del" data-id="'+f.id+'">🗑</button>');
+          partes.push('</li>');
+        });
+        partes.push('</ul>');
+      }
+
+      container.innerHTML = partes.join('');
+
+      var btnAdd = document.getElementById('btn-falta-add');
+      if (btnAdd) btnAdd.onclick = function() {
+        var nome   = document.getElementById('falta-pessoa').value;
+        var data   = document.getElementById('falta-data').value;
+        var motivo = document.getElementById('falta-motivo').value||'Nao informado';
+        if (!nome||!data){ toast('Selecione a pessoa e a data!','erro'); return; }
+        FALTAS.registrar(nome, data, motivo);
+        document.getElementById('falta-pessoa').value='';
+        document.getElementById('falta-data').value='';
+        document.getElementById('falta-motivo').value='';
+        FALTAS.renderizar();
+        toast('Falta registrada!');
+      };
+
+      container.querySelectorAll('.falta-del').forEach(function(btn){
+        btn.onclick = function(){
+          if(!confirm('Remover este registro?')) return;
+          FALTAS.remover(btn.getAttribute('data-id'));
+          FALTAS.renderizar();
+          toast('Removido.','erro');
+        };
+      });
+    }).catch(function(e){
+      container.innerHTML = '<p class="empty-state">Erro ao carregar. Recarregue a pagina.</p>';
     });
-  },
-
-  _registrarUI: function() {
-    var nome   = document.getElementById('falta-pessoa').value;
-    var data   = document.getElementById('falta-data').value;
-    var motivo = document.getElementById('falta-motivo').value || 'Não informado';
-    if (!nome || !data) { toast('Selecione a pessoa e a data!', 'erro'); return; }
-    this.registrar(null, nome, data, motivo);
-    document.getElementById('falta-pessoa').value = '';
-    document.getElementById('falta-data').value   = '';
-    document.getElementById('falta-motivo').value = '';
-    this.renderizar();
-    toast('Falta registrada! ✓');
-  },
-
-  _removerUI: function(id) {
-    if (!confirm('Remover este registro de falta?')) return;
-    this.remover(id);
-    this.renderizar();
-    toast('Removido.', 'erro');
   }
 };
 
-/* ═══════════════════════════════════════════════════════
-   MÓDULO: CALENDÁRIO SEMANAL
-═══════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════
+   MÓDULO CALENDARIO — v2 corrigido
+════════════════════════════════════════════════════════ */
 var CALENDARIO = {
   semanaOffset: 0,
 
   _semanaAtual: function() {
     var hoje = new Date();
     hoje.setDate(hoje.getDate() + (this.semanaOffset * 7));
-    /* Volta para domingo */
     var dom = new Date(hoje);
     dom.setDate(hoje.getDate() - hoje.getDay());
+    dom.setHours(0,0,0,0);
     return dom;
   },
 
   renderizar: function() {
     var container = document.getElementById('calendario-body');
     if (!container) return;
+    container.innerHTML = '<p class="empty-state">Carregando calendario...</p>';
 
     var inicio = this._semanaAtual();
-    var dias   = [];
+    var dias = [];
     for (var i = 0; i < 7; i++) {
       var d = new Date(inicio);
       d.setDate(inicio.getDate() + i);
       dias.push(d);
     }
 
-    var p1 = dias[0];
-    var p7 = dias[6];
-    var fmtSimples = function(d) {
-      return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0');
-    };
-    var tituloSemana = fmtSimples(p1) + ' — ' + fmtSimples(p7) + '/' + p7.getFullYear();
+    var fmt2 = function(d){ return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0'); };
+    var tit  = fmt2(dias[0])+' a '+fmt2(dias[6])+'/'+dias[6].getFullYear();
+    var mes  = document.getElementById('mesSelecionado').value || null;
+    var hoje = new Date(); hoje.setHours(0,0,0,0);
 
-    var html = '<div class="cal-nav">' +
-      '<button class="btn-secondary" style="width:auto;padding:8px 14px" onclick="CALENDARIO.navegar(-1)">◀ Anterior</button>' +
-      '<span class="cal-titulo">' + tituloSemana + '</span>' +
-      '<button class="btn-secondary" style="width:auto;padding:8px 14px" onclick="CALENDARIO.navegar(1)">Próxima ▶</button>' +
-      '<button class="btn-save" style="width:auto;padding:8px 14px;margin-left:8px" onclick="CALENDARIO.semanaOffset=0;CALENDARIO.renderizar()">Hoje</button>' +
-      '</div>';
-
-    var mes = document.getElementById('mesSelecionado').value;
-
-    api.getEscala(mes || null).then(function(escala) {
+    api.getEscala(mes).then(function(escala) {
       var feriados = FERIADOS.get();
-      var nomesDias = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-      var hoje = new Date(); hoje.setHours(0,0,0,0);
+      var nomeDias = ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'];
 
-      html += '<div class="cal-grid">';
+      var partes = [];
+      partes.push('<div class="cal-nav">');
+      partes.push('<button class="btn-secondary" id="btn-cal-prev" style="width:auto;padding:8px 12px">Anterior</button>');
+      partes.push('<span class="cal-titulo">'+tit+'</span>');
+      partes.push('<button class="btn-secondary" id="btn-cal-prox" style="width:auto;padding:8px 12px">Proxima</button>');
+      partes.push('<button class="btn-save" id="btn-cal-hoje" style="width:auto;padding:8px 12px">Hoje</button>');
+      partes.push('</div>');
+      partes.push('<div class="cal-grid">');
 
       dias.forEach(function(dia) {
-        var dataStr = dia.getFullYear() + '-' +
-          String(dia.getMonth()+1).padStart(2,'0') + '-' +
-          String(dia.getDate()).padStart(2,'0');
+        var ano = dia.getFullYear();
+        var m   = String(dia.getMonth()+1).padStart(2,'0');
+        var dd  = String(dia.getDate()).padStart(2,'0');
+        var dataStr = ano+'-'+m+'-'+dd;
 
-        var ehHoje    = dia.getTime() === hoje.getTime();
-        var feriado   = feriados.find(function(f) { return f.data === dataStr; });
-        var turnos    = escala.filter(function(i) { return i.data === dataStr; });
-        var nomeDia   = nomesDias[dia.getDay()];
-        var classeCol = 'cal-col' + (ehHoje ? ' cal-hoje' : '') + (feriado ? ' cal-feriado' : '');
+        var ehHoje  = dia.getTime() === hoje.getTime();
+        var feriado = feriados.find(function(f){ return f.data === dataStr; });
+        var turnos  = escala.filter(function(i){ return i.data === dataStr; });
+        turnos.sort(function(a,b){ return a.horario.localeCompare(b.horario); });
 
-        html += '<div class="' + classeCol + '">';
-        html += '<div class="cal-dia-header">';
-        html += '<span class="cal-dia-nome">' + nomeDia + '</span>';
-        html += '<span class="cal-dia-num">' + dia.getDate() + '</span>';
-        if (feriado) html += '<span class="cal-feriado-tag">' + feriado.nome + '</span>';
-        html += '</div>';
-        html += '<div class="cal-turnos">';
+        var cls = 'cal-col'+(ehHoje?' cal-hoje':'')+(feriado?' cal-feriado':'');
 
-        if (turnos.length === 0) {
-          html += '<div class="cal-vazio">—</div>';
+        partes.push('<div class="'+cls+'">');
+        partes.push('<div class="cal-dia-header">');
+        partes.push('<span class="cal-dia-nome">'+nomeDias[dia.getDay()]+'</span>');
+        partes.push('<span class="cal-dia-num">'+dia.getDate()+'</span>');
+        if (feriado) partes.push('<span class="cal-feriado-tag">'+feriado.nome+'</span>');
+        partes.push('</div><div class="cal-turnos">');
+
+        if (!turnos.length) {
+          partes.push('<div class="cal-vazio">-</div>');
         } else {
-          turnos.sort(function(a,b){return a.horario.localeCompare(b.horario);})
-                .forEach(function(t) {
-            html += '<div class="cal-turno-card">' +
-              '<div class="cal-horario">' + t.horario.replace(':','h') + '</div>' +
-              '<div class="cal-pessoas">' +
-                FOTOS.avatar(t.educadora, 22) +
-                '<span class="cal-nome-edu">' + (t.educadora||'').split(' ')[0] + '</span>' +
-              '</div>' +
-              '<div class="cal-pessoas">' +
-                FOTOS.avatar(t.auxiliar, 22) +
-                '<span class="cal-nome-aux">' + (t.auxiliar||'').split(' ')[0] + '</span>' +
-              '</div>' +
-              '</div>';
+          turnos.forEach(function(t) {
+            partes.push('<div class="cal-turno-card">');
+            partes.push('<div class="cal-horario">'+t.horario.replace(':','h')+'</div>');
+            partes.push('<div class="cal-pessoas">');
+            partes.push(FOTOS.avatar(t.educadora||'?', 20));
+            partes.push('<span class="cal-nome-edu">'+((t.educadora||'').split(' ')[0])+'</span>');
+            partes.push('</div><div class="cal-pessoas">');
+            partes.push(FOTOS.avatar(t.auxiliar||'?', 20));
+            partes.push('<span class="cal-nome-aux">'+((t.auxiliar||'').split(' ')[0])+'</span>');
+            partes.push('</div></div>');
           });
         }
 
-        html += '</div></div>';
+        partes.push('</div></div>');
       });
 
-      html += '</div>';
-      container.innerHTML = html;
-    });
-  },
+      partes.push('</div>');
+      container.innerHTML = partes.join('');
 
-  navegar: function(dir) {
-    this.semanaOffset += dir;
-    this.renderizar();
+      /* Navegação via JS */
+      document.getElementById('btn-cal-prev').onclick  = function(){ CALENDARIO.semanaOffset--; CALENDARIO.renderizar(); };
+      document.getElementById('btn-cal-prox').onclick  = function(){ CALENDARIO.semanaOffset++; CALENDARIO.renderizar(); };
+      document.getElementById('btn-cal-hoje').onclick  = function(){ CALENDARIO.semanaOffset=0; CALENDARIO.renderizar(); };
+
+    }).catch(function(e){
+      container.innerHTML = '<p class="empty-state">Erro ao carregar escala. Tente novamente.</p>';
+    });
   }
 };
 
-/* ═══════════════════════════════════════════════════════
-   MÓDULO: SUBSTITUIÇÃO
-═══════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════
+   MÓDULO SUBSTITUICAO — v2 corrigido
+════════════════════════════════════════════════════════ */
 var SUBSTITUICAO = {
   renderizar: function() {
     var container = document.getElementById('subst-body');
     if (!container) return;
-    var mes = document.getElementById('mesSelecionado').value;
 
-    var html = '<div class="form-card"><div class="card-title">🔄 Encontrar Substituto</div>' +
-      '<div class="form-grid">' +
-      '<div class="field"><span class="field-label">Quem vai faltar</span>' +
-      '<select id="subst-pessoa"><option value="">Selecione...</option></select></div>' +
-      '<div class="field"><span class="field-label">Data do turno</span>' +
-      '<input type="date" id="subst-data"/></div>' +
-      '<div class="field"><span class="field-label">Horário</span>' +
-      '<select id="subst-horario"><option value="07:00">07:00</option>' +
-      '<option value="09:30">09:30</option><option value="18:00">18:00</option></select></div>' +
-      '<div class="field field-btn">' +
-      '<button class="btn-primary" onclick="SUBSTITUICAO.buscar()">🔍 Buscar Substituto</button>' +
-      '</div></div></div>' +
-      '<div id="subst-resultado"></div>';
-
-    container.innerHTML = html;
+    var partes = [];
+    partes.push('<div class="form-card"><div class="card-title">Encontrar Substituto</div>');
+    partes.push('<div class="form-grid">');
+    partes.push('<div class="field"><span class="field-label">Quem vai faltar</span>');
+    partes.push('<select id="subst-pessoa"><option value="">Selecione...</option></select></div>');
+    partes.push('<div class="field"><span class="field-label">Data do turno</span><input type="date" id="subst-data"/></div>');
+    partes.push('<div class="field"><span class="field-label">Horario</span>');
+    partes.push('<select id="subst-horario"><option value="07:00">07:00</option><option value="09:30">09:30</option><option value="18:00">18:00</option></select></div>');
+    partes.push('<div class="field field-btn"><button class="btn-primary" id="btn-subst-buscar">Buscar Substituto</button></div>');
+    partes.push('</div></div>');
+    partes.push('<div id="subst-resultado"></div>');
+    container.innerHTML = partes.join('');
 
     api.getPessoas().then(function(pessoas) {
       var sel = document.getElementById('subst-pessoa');
       if (!sel) return;
-      pessoas.sort(function(a,b){return a.nome.localeCompare(b.nome);}).forEach(function(p) {
-        sel.innerHTML += '<option value="' + p.nome + '" data-tipo="' + p.tipo + '">' + p.nome + ' (' + p.tipo + ')</option>';
+      pessoas.sort(function(a,b){return a.nome.localeCompare(b.nome);}).forEach(function(p){
+        var opt = document.createElement('option');
+        opt.value = p.nome;
+        opt.textContent = p.nome+' ('+p.tipo+')';
+        opt.setAttribute('data-tipo', p.tipo);
+        sel.appendChild(opt);
       });
     });
+
+    var btnBuscar = document.getElementById('btn-subst-buscar');
+    if (btnBuscar) btnBuscar.onclick = function() { SUBSTITUICAO.buscar(); };
   },
 
   buscar: function() {
-    var sel    = document.getElementById('subst-pessoa');
-    var nome   = sel.value;
-    var tipo   = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].getAttribute('data-tipo') : '';
-    var data   = document.getElementById('subst-data').value;
-    var horario= document.getElementById('subst-horario').value;
-    var res    = document.getElementById('subst-resultado');
+    var sel     = document.getElementById('subst-pessoa');
+    var nome    = sel ? sel.value : '';
+    var tipo    = sel && sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].getAttribute('data-tipo') : '';
+    var data    = document.getElementById('subst-data').value;
+    var horario = document.getElementById('subst-horario').value;
+    var res     = document.getElementById('subst-resultado');
 
-    if (!nome || !data) { toast('Selecione a pessoa e a data!', 'erro'); return; }
+    if (!nome||!data){ toast('Selecione a pessoa e a data!','erro'); return; }
+    res.innerHTML = '<p style="color:var(--text-dim);padding:12px">Buscando substitutos...</p>';
 
     var mes = data.substring(0,7);
-
-    Promise.all([api.getPessoas(), api.getEscala(mes)]).then(function(results) {
+    Promise.all([api.getPessoas(), api.getEscala(mes)]).then(function(results){
       var pessoas = results[0];
       var escala  = results[1];
       var faltas  = FALTAS.get();
 
-      /* Candidatos do mesmo tipo */
-      var candidatos = pessoas.filter(function(p) {
-        return p.tipo === tipo && p.nome !== nome;
-      });
+      var candidatos = pessoas.filter(function(p){ return p.tipo===tipo && p.nome!==nome; });
 
-      /* Pontua cada candidato */
-      var pontuados = candidatos.map(function(p) {
-        /* Turno no mesmo dia/hora = não pode */
-        var ocupado = escala.some(function(i) {
-          return i.data === data && i.horario === horario &&
-                 (i.educadora === p.nome || i.auxiliar === p.nome);
+      var pontuados = candidatos.map(function(p){
+        var ocupado = escala.some(function(i){
+          return i.data===data && i.horario===horario && (i.educadora===p.nome||i.auxiliar===p.nome);
         });
-
-        /* Quantos turnos tem no mês */
-        var turnos = escala.filter(function(i) {
-          return i.educadora === p.nome || i.auxiliar === p.nome;
-        }).length;
-
-        /* Quantas faltas tem */
-        var nFaltas = faltas.filter(function(f) { return f.nome === p.nome; }).length;
-
-        return {
-          nome:    p.nome,
-          tipo:    p.tipo,
-          ocupado: ocupado,
-          turnos:  turnos,
-          faltas:  nFaltas,
-          score:   ocupado ? -999 : (100 - turnos * 5 - nFaltas * 10)
-        };
+        var turnos = escala.filter(function(i){ return i.educadora===p.nome||i.auxiliar===p.nome; }).length;
+        var nFaltas = faltas.filter(function(f){ return f.nome===p.nome; }).length;
+        return { nome:p.nome, ocupado:ocupado, turnos:turnos, faltas:nFaltas, score: ocupado?-999:(100-turnos*5-nFaltas*10) };
       });
+      pontuados.sort(function(a,b){ return b.score-a.score; });
 
-      pontuados.sort(function(a,b) { return b.score - a.score; });
-
-      var disponiveis = pontuados.filter(function(p) { return !p.ocupado; });
-      var ocupados    = pontuados.filter(function(p) { return p.ocupado; });
+      var disponiveis = pontuados.filter(function(p){ return !p.ocupado; });
+      var ocupados    = pontuados.filter(function(p){ return p.ocupado; });
 
       var p = data.split('-');
       var dataFmt = p[2]+'/'+p[1]+'/'+p[0];
-
-      var html = '<div style="margin-top:16px"><h3 class="rel-subtitulo">Substitutos para ' +
-        nome + ' — ' + dataFmt + ' às ' + horario + '</h3>';
+      var partes = [];
+      partes.push('<div style="margin-top:16px">');
+      partes.push('<h3 class="rel-subtitulo">Substitutos para '+nome+' em '+dataFmt+' as '+horario+'</h3>');
 
       if (!disponiveis.length) {
-        html += '<p class="empty-state">Nenhum substituto disponível neste horário.</p>';
+        partes.push('<p class="empty-state">Nenhum substituto disponivel neste horario.</p>');
       } else {
-        html += '<ul>';
-        disponiveis.forEach(function(p, i) {
-          var medalha = i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
-          var cor = i===0?'var(--gold)':i===1?'#b0bec5':i===2?'#cd7f32':'var(--text-dim)';
-          html += '<li class="escala-item">' +
-            '<span style="font-size:20px;width:28px;text-align:center">' + (medalha||'') + '</span>' +
-            FOTOS.avatar(p.nome, 36) +
-            '<div class="c-pessoa" style="flex:1">' +
-              '<div style="font-weight:700;color:' + cor + '">' + p.nome + '</div>' +
-              '<div style="font-size:11px;color:var(--text-dim)">' +
-                p.turnos + ' turnos no mês · ' + p.faltas + ' falta(s) histórico' +
-              '</div>' +
-            '</div>' +
-            '<button class="btn-wa-todos" style="font-size:11px;padding:6px 12px" ' +
-              'onclick="SUBSTITUICAO.enviarWA(\'' + p.nome + '\',\'' + dataFmt + '\',\'' + horario + '\')">📲 Chamar</button>' +
-            '</li>';
+        var medalhas = ['1', '2', '3'];
+        partes.push('<ul>');
+        disponiveis.forEach(function(p, i){
+          partes.push('<li class="escala-item">');
+          partes.push('<span style="font-size:18px;width:28px;text-align:center">'+(i<3?'#'+(i+1):'')+'</span>');
+          partes.push(FOTOS.avatar(p.nome, 36));
+          partes.push('<div class="c-pessoa" style="flex:1">');
+          partes.push('<div style="font-weight:700">'+p.nome+'</div>');
+          partes.push('<div style="font-size:11px;color:var(--text-dim)">'+p.turnos+' turnos no mes - '+p.faltas+' falta(s)</div>');
+          partes.push('</div>');
+          partes.push('<button class="btn-wa-todos subst-wabtn" style="font-size:11px;padding:6px 10px" data-nome="'+p.nome+'" data-data="'+dataFmt+'" data-hr="'+horario+'">Chamar</button>');
+          partes.push('</li>');
         });
-        html += '</ul>';
+        partes.push('</ul>');
       }
 
       if (ocupados.length) {
-        html += '<p style="font-size:12px;color:var(--text-muted);margin-top:12px">' +
-          '⚠ ' + ocupados.map(function(p){return p.nome;}).join(', ') +
-          ' já têm turno neste horário.</p>';
+        partes.push('<p style="font-size:11px;color:var(--text-muted);margin-top:10px">Ja tem turno neste horario: '+ocupados.map(function(p){return p.nome;}).join(', ')+'</p>');
       }
+      partes.push('</div>');
 
-      html += '</div>';
-      res.innerHTML = html;
+      res.innerHTML = partes.join('');
+
+      res.querySelectorAll('.subst-wabtn').forEach(function(btn){
+        btn.onclick = function(){
+          var nm = btn.getAttribute('data-nome');
+          var dt = btn.getAttribute('data-data');
+          var hr = btn.getAttribute('data-hr');
+          var tels = WA.getTelefones();
+          var tel = tels[nm];
+          if (!tel){ toast('WhatsApp de '+nm+' nao cadastrado! Va na aba WhatsApp.','aviso'); return; }
+          var num = ('55'+tel.replace(/\D/g,'')).replace(/^5555/,'55');
+          var msg = 'EBI - Substituicao\n\nOla, '+nm+'!\n\nPrecisamos de substituto:\nData: '+dt+'\nHorario: '+hr+'\n\nVoce pode nos ajudar?';
+          window.open('https://wa.me/'+num+'?text='+encodeURIComponent(msg),'_blank');
+        };
+      });
+    }).catch(function(e){
+      res.innerHTML = '<p class="empty-state">Erro ao buscar. Tente novamente.</p>';
     });
-  },
-
-  enviarWA: function(nome, data, horario) {
-    var tels = WA.getTelefones();
-    var tel  = tels[nome];
-    if (!tel) {
-      toast('WhatsApp de ' + nome + ' não cadastrado! Vá na aba WhatsApp.', 'aviso');
-      return;
-    }
-    var num = tel.replace(/\D/g,'');
-    if (num.length <= 11) num = '55' + num;
-    var msg = '✝ *EBI — Solicitação de Substituição*\n\n' +
-      'Olá, *' + nome + '*!\n\n' +
-      'Precisamos de substituto para o turno:\n' +
-      '📅 *' + data + '* às *' + horario + '*\n\n' +
-      'Você pode nos ajudar? Por favor, confirme.\n\n' +
-      '_Sistema EBI_';
-    window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(msg), '_blank');
   }
 };
 
-/* ═══════════════════════════════════════════════════════
-   MÓDULO: ESTATÍSTICAS / GRÁFICOS
-═══════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════
+   MÓDULO STATS — v2 corrigido
+════════════════════════════════════════════════════════ */
 var STATS = {
   renderizar: function() {
     var container = document.getElementById('stats-body');
     if (!container) return;
-    var mes = document.getElementById('mesSelecionado').value;
+    container.innerHTML = '<p class="empty-state">Carregando estatisticas...</p>';
 
-    api.getEscala(mes || null).then(function(escala) {
+    var mes = document.getElementById('mesSelecionado').value;
+    if (!mes) {
+      container.innerHTML = '<p class="empty-state">Selecione um mes na barra lateral para ver as estatisticas.</p>';
+      return;
+    }
+
+    api.getEscala(mes).then(function(escala) {
       if (!escala.length) {
-        container.innerHTML = '<p class="empty-state">Nenhum dado para mostrar.<br>Gere a escala primeiro.</p>';
+        container.innerHTML = '<p class="empty-state">Nenhum dado neste mes.<br>Gere a escala primeiro.</p>';
         return;
       }
 
-      /* Contagens */
-      var porPessoa = {}, porHorario = {}, porDiaSemana = {}, porTurno = {};
-      var nomes = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+      var porPessoa = {}, porHorario = {}, porDia = {};
+      var nomDias   = ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'];
 
-      escala.forEach(function(i) {
-        [i.educadora, i.auxiliar].forEach(function(n) {
-          if (n) porPessoa[n] = (porPessoa[n] || 0) + 1;
-        });
-        porHorario[i.horario]  = (porHorario[i.horario] || 0) + 1;
-        var ds = nomes[new Date(i.data+'T00:00:00').getDay()];
-        porDiaSemana[ds]       = (porDiaSemana[ds] || 0) + 1;
-        porTurno[i.turno||'Escala'] = (porTurno[i.turno||'Escala'] || 0) + 1;
+      escala.forEach(function(i){
+        if(i.educadora) porPessoa[i.educadora]  = (porPessoa[i.educadora]||0)+1;
+        if(i.auxiliar)  porPessoa[i.auxiliar]   = (porPessoa[i.auxiliar]||0)+1;
+        porHorario[i.horario] = (porHorario[i.horario]||0)+1;
+        var ds = nomDias[new Date(i.data+'T00:00:00').getDay()];
+        porDia[ds] = (porDia[ds]||0)+1;
       });
 
-      var html = '<div class="stats-grid">';
-
-      /* Gráfico de barras — turnos por pessoa */
-      html += STATS._barras('Turnos por Pessoa', porPessoa, 'var(--blue2)');
-      html += STATS._barras('Turnos por Horário', porHorario, 'var(--gold)');
-      html += STATS._barras('Turnos por Dia da Semana', porDiaSemana, 'var(--edu)');
-      html += STATS._pizza('Distribuição por Turno', porTurno);
-
-      html += '</div>';
-      container.innerHTML = html;
+      var partes = [];
+      partes.push('<div class="stats-grid">');
+      partes.push(STATS._barras('Turnos por Pessoa', porPessoa, 'var(--blue2)'));
+      partes.push(STATS._barras('Turnos por Horario', porHorario, 'var(--gold)'));
+      partes.push(STATS._barras('Turnos por Dia da Semana', porDia, 'var(--edu)'));
+      partes.push('</div>');
+      container.innerHTML = partes.join('');
+    }).catch(function(e){
+      container.innerHTML = '<p class="empty-state">Erro ao carregar. Tente novamente.</p>';
     });
   },
 
   _barras: function(titulo, dados, cor) {
-    var max = Math.max.apply(null, Object.values(dados));
-    var html = '<div class="stats-card"><h3 class="rel-subtitulo">' + titulo + '</h3>';
-    Object.keys(dados).sort(function(a,b){return dados[b]-dados[a];}).forEach(function(k) {
+    var chaves = Object.keys(dados);
+    if (!chaves.length) return '';
+    var max = Math.max.apply(null, chaves.map(function(k){ return dados[k]; }));
+    var partes = [];
+    partes.push('<div class="stats-card"><h3 class="rel-subtitulo">'+titulo+'</h3>');
+    chaves.sort(function(a,b){ return dados[b]-dados[a]; }).forEach(function(k){
       var pct = Math.round((dados[k]/max)*100);
-      html += '<div class="bar-row">' +
-        '<span class="bar-label">' + k + '</span>' +
-        '<div class="bar-track">' +
-          '<div class="bar-fill" style="width:' + pct + '%;background:' + cor + '">' +
-            '<span class="bar-val">' + dados[k] + '</span>' +
-          '</div>' +
-        '</div>' +
-        '</div>';
+      partes.push('<div class="bar-row">');
+      partes.push('<span class="bar-label">'+k+'</span>');
+      partes.push('<div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;background:'+cor+'"><span class="bar-val">'+dados[k]+'</span></div></div>');
+      partes.push('</div>');
     });
-    return html + '</div>';
-  },
-
-  _pizza: function(titulo, dados) {
-    var total = Object.values(dados).reduce(function(a,b){return a+b;},0);
-    var cores = ['var(--blue)','var(--gold)','var(--edu)','var(--aux)','var(--sucesso)'];
-    var html = '<div class="stats-card"><h3 class="rel-subtitulo">' + titulo + '</h3>';
-    var i = 0;
-    Object.keys(dados).forEach(function(k) {
-      var pct = Math.round((dados[k]/total)*100);
-      html += '<div class="pizza-row">' +
-        '<span class="pizza-dot" style="background:' + cores[i%cores.length] + '"></span>' +
-        '<span class="pizza-label">' + k + '</span>' +
-        '<span class="pizza-pct">' + pct + '% (' + dados[k] + ')</span>' +
-        '</div>';
-      i++;
-    });
-    return html + '</div>';
+    partes.push('</div>');
+    return partes.join('');
   }
 };
 
